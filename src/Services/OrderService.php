@@ -76,13 +76,16 @@ class OrderService
             $sms->mandarSms($destino, "Pedido {$id} por $ {$total}");
         }
 
-        // ---- 5. Avisos internos (deberia ser un Observer) ----
-        $eventos = new OrderEvents();
-        $eventos->pedidoCreado($order);
+        // ---- 5. Avisos internos (Observer) ----
+        $eventos = new OrderSubject();
+        $eventos->subscribe(new EmailObserver('paciente@mail.com'));
+        $eventos->subscribe(new SmsObserver('3704000000'));
+        $eventos->subscribe(new DashboardObserver());
+        $eventos->notify($order);
 
-        // ---- 6. Reporte (deberia ser un Decorator) ----
-        $generador = new ReportGenerator();
-        echo $generador->generate("Pedido {$id}", true, true, false) . '<br>';
+        // ---- 6. Reporte (Decorator: firma -> PDF) ----
+        $reporte = new PdfReportDecorator(new DigitalSignatureDecorator(new BasicReport("Pedido {$id}")));
+        echo $reporte->generate() . '<br>';
 
         // ---- 7. Presentacion (deberia ser una View) ----
         echo "<p>Pedido {$id} procesado. Total: $ {$total}</p>";
