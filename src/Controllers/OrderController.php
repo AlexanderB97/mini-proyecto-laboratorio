@@ -7,7 +7,7 @@
  *
  *  ❌ DEUDA SEMBRADA — el "God Controller"
  *     1. Arma SQL directamente.
- *     2. Contiene reglas de negocio (descuentos).
+ *     2. ✅ Resuelto: el descuento se delega en PricingStrategy.
  *     3. Imprime HTML con echo.
  *     4. Crea con new todas sus dependencias concretas.
  *     5. Repite por TERCERA vez el if de notificaciones.
@@ -35,8 +35,7 @@ class OrderController
         $monto    = (float) ($_GET['monto'] ?? 15000);
         $tipo     = $_GET['tipo'] ?? 'obra_social';
 
-        // ❌ 2. Regla de negocio dentro del controlador (deberia ser Strategy)
-        $total = $tipo === 'obra_social' ? $monto * 0.7 : $monto;
+        $total = (new PriceCalculator(PricingStrategyResolver::forPatientType($tipo)))->calculate($monto);
 
         // ❌ 3. SQL dentro del controlador (deberia ser Repository)
         $conexion = Connection::obtener();
