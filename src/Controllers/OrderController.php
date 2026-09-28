@@ -23,12 +23,18 @@ class OrderController
 
     public function create(): void
     {
-        $order = $this->facade->createOrder(
-            (int) ($_GET['id'] ?? 1),
-            (string) ($_GET['paciente'] ?? 'Juan Perez'),
-            (float) ($_GET['monto'] ?? 15000),
-            (string) ($_GET['tipo'] ?? 'obra_social')
-        );
+        try {
+            $order = $this->facade->createOrder(
+                (int) ($_GET['id'] ?? 1),
+                (string) ($_GET['paciente'] ?? 'Juan Perez'),
+                (float) ($_GET['monto'] ?? 15000),
+                (string) ($_GET['tipo'] ?? 'obra_social')
+            );
+        } catch (InvalidArgumentException $e) {
+            $error = $e->getMessage();
+            require __DIR__ . '/../../views/order_error.php';
+            return;
+        }
 
         require __DIR__ . '/../../views/order_created.php';
     }

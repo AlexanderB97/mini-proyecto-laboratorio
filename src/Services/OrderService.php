@@ -5,59 +5,48 @@
  *  Principio aplicado: SRP
  * ============================================================================
  *
- *  OrderService solo COORDINA. Cada paso lo hace otra clase:
+ *  OrderService solo COORDINA la creacion de un pedido. Cada paso lo hace
+ *  otra clase:
  *     Validacion            -> OrderValidator
  *     Precio                -> PriceCalculator + PricingStrategy
  *     Persistencia          -> Order::guardar() (pendiente: OrderRepository)
- *     Aviso al paciente     -> PatientNotifier
- *     Avisos internos       -> OrderSubject + observers
- *     Reporte               -> decoradores de Report
+ *     Avisos                -> OrderSubject + observers (email y SMS al
+ *                              paciente, dashboard via sistema heredado)
  *
  *  ⚠️ Si el servicio empieza a DECIDIR reglas de negocio, vuelve a ser la
  *     clase que hace todo.
- *  ⚠️ Los echo son de presentacion: se mueven a una View en el refactor MVC.
+ *  ✅ No imprime nada: la presentacion la hacen las vistas (MVC).
  * ============================================================================
  */
 
 final class OrderService
 {
     private OrderValidator $validator;
-    private PatientNotifier $notifier;
     private OrderSubject $events;
 
     public function __construct(
         ?OrderValidator $validator = null,
-        ?PatientNotifier $notifier = null,
         ?OrderSubject $events = null
     ) {
         $this->validator = $validator ?? new OrderValidator();
-        $this->notifier  = $notifier ?? new PatientNotifier();
         $this->events    = $events ?? self::defaultEvents();
     }
 
-    public function procesarPedidoCompleto(
-        int $id,
-        string $paciente,
-        float $monto,
-        string $tipoPaciente,
-        string $tipoNotificacion,
-        string $destino
-    ): void {
+    /** @throws InvalidArgumentException si los datos de entrada no son validos. */
+    public function createOrder(int $id, string $paciente, float $monto, string $tipoPaciente): Order
+    {
         $error = $this->validator->validate($paciente, $monto);
         if ($error !== null) {
-            echo "{$error}<br>";
-            return;
+            throw new InvalidArgumentException($error);
         }
 
         $total = (new PriceCalculator(PricingStrategyResolver::forPatientType($tipoPaciente)))->calculate($monto);
         $order = new Order($id, $paciente, $total, $tipoPaciente);
         $order->guardar();
 
-        $this->notifier->notify($order, $tipoNotificacion, $destino);
         $this->events->notify($order);
 
-        echo (new PdfReportDecorator(new DigitalSignatureDecorator(new BasicReport("Pedido {$id}"))))->generate() . '<br>';
-        echo "<p>Pedido {$id} procesado. Total: $ {$total}</p>";
+        return $order;
     }
 
     private static function defaultEvents(): OrderSubject
