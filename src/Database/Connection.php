@@ -20,11 +20,19 @@ class Connection
     /** Almacen en memoria para poder correr la demo sin MySQL levantado. */
     private array $tablaEnMemoria = [];
 
+    private array $config;
+
     private function __construct()
     {
+        $archivo = __DIR__ . '/../../config/database.php';
+        if (!is_file($archivo)) {
+            throw new RuntimeException('Falta config/database.php. Copiá config/database.example.php y completá los datos.');
+        }
+        $this->config = require $archivo;
+
         // En un entorno con MySQL real, acá se abriría la conexión PDO:
-        // $dsn = "mysql:host={$config['host']};dbname={$config['name']};charset=utf8mb4";
-        // $this->pdo = new PDO($dsn, $config['user'], $config['pass'], [
+        // $dsn = "mysql:host={$this->config['host']};dbname={$this->config['name']};charset=utf8mb4";
+        // $this->pdo = new PDO($dsn, $this->config['user'], $this->config['pass'], [
         //     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         // ]);
     }
