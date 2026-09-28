@@ -7,7 +7,7 @@
  *
  *  ❌ DEUDA SEMBRADA EN ESTE ARCHIVO
  *     1. Carga manual de dependencias con require (se rompe al agregar clases).
- *     2. Credenciales de base de datos escritas en el código y versionadas.
+ *     2. (Resuelto) Credenciales movidas a config/database.php, fuera del repositorio.
  *     3. Ruteo resuelto con una cadena de if que crece con cada pantalla.
  *
  *  ✅ FORMA CORRECTA
@@ -56,20 +56,6 @@ require_once __DIR__ . '/../src/Controllers/OrderController.php';
  *         require_once $file;
  *     }
  * });
- */
-
-// ❌ MAL APLICADO: credenciales en el código fuente y dentro del repositorio.
-//    Si el repo es público, la credencial es pública.
-//    Además, cada integrante edita esta línea => conflicto en cada merge.
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'laboratorio');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-
-/*
- * ✅ FORMA CORRECTA:
- *   $config = require __DIR__ . '/../config/database.php';   // ignorado por git
- *   El repositorio versiona config/database.example.php con valores vacíos.
  */
 
 $accion = $_GET['accion'] ?? 'crear';
