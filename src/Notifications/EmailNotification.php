@@ -6,8 +6,7 @@
  * ============================================================================
  *
  *  ✅ Implementa Notification::send() para compartir contrato con SMS.
- *  ✅ Se mantiene enviarEmail() por compatibilidad, hasta que OrderEvents.php
- *     y OrderService.php se refactoricen para usar el Factory directamente.
+ *  ✅ Se crea solo a través de NotificationFactory.
  * ============================================================================
  */
 
@@ -24,11 +23,6 @@ class EmailNotification implements Notification
 
     public function send(string $message): void
     {
-        $this->enviarEmail($this->destinatario, 'Pedido del laboratorio', $message);
-    }
-
-    public function enviarEmail(string $destinatario, string $asunto, string $cuerpo): void
-    {
-        echo "[EMAIL] para {$destinatario} | {$asunto}: {$cuerpo}<br>";
+        echo "[EMAIL] para {$this->destinatario} | Pedido del laboratorio: {$message}<br>";
     }
 }
