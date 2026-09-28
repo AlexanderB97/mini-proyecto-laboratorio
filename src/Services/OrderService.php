@@ -76,9 +76,12 @@ class OrderService
             $sms->mandarSms($destino, "Pedido {$id} por $ {$total}");
         }
 
-        // ---- 5. Avisos internos (deberia ser un Observer) ----
-        $eventos = new OrderEvents();
-        $eventos->pedidoCreado($order);
+        // ---- 5. Avisos internos (Observer) ----
+        $eventos = new OrderSubject();
+        $eventos->subscribe(new EmailObserver('paciente@mail.com'));
+        $eventos->subscribe(new SmsObserver('3704000000'));
+        $eventos->subscribe(new DashboardObserver());
+        $eventos->notify($order);
 
         // ---- 6. Reporte (deberia ser un Decorator) ----
         $generador = new ReportGenerator();
