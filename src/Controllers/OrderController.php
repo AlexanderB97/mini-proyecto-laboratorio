@@ -1,103 +1,49 @@
 <?php
-
 /**
  * ============================================================================
  *  CONTROLADOR DE PEDIDOS
- *  Patron esperado: MVC bien aplicado (arquitectonico) + SRP
+ *  Patron aplicado: MVC + FACADE
  * ============================================================================
  *
- *  ❌ DEUDA SEMBRADA — el "God Controller"
- *     1. Arma SQL directamente.
- *     2. ✅ Resuelto: el descuento se delega en PricingStrategy.
- *     3. Imprime HTML con echo.
- *     4. Crea con new todas sus dependencias concretas.
- *     5. Repite por TERCERA vez el if de notificaciones.
- *
- *  Tener las carpetas /Controllers /Models /views NO significa aplicar MVC.
- *  MVC es separacion de responsabilidades, no estructura de directorios.
- *
- *  ✅ FORMA CORRECTA
- *     El controlador solo: recibe la entrada, la valida como entrada,
- *     llama a UN servicio o fachada, y elige que vista renderizar.
+ *  ✅ El controlador solo: lee la entrada, llama a la fachada y elige la vista.
+ *  ✅ Sin SQL (lo hace el modelo), sin reglas de negocio (Strategy, Factory,
+ *     Decorator, detras de OrderFacade) y sin HTML (lo hacen las vistas).
+ *  ✅ Depende de una sola clase, OrderFacade, que se recibe por constructor.
  * ============================================================================
  */
 
 class OrderController
 {
-    /**
-     * ❌ METODO MAL APLICADO: create()
-     *    Mezcla las tres capas de MVC dentro de un solo metodo.
-     */
-    public function create(): void
+    private OrderFacade $facade;
+
+    public function __construct(?OrderFacade $facade = null)
     {
-        // ❌ 1. Entrada sin validar ni sanitizar
-        $id       = (int) ($_GET['id'] ?? 1);
-        $paciente = $_GET['paciente'] ?? 'Juan Perez';
-        $monto    = (float) ($_GET['monto'] ?? 15000);
-        $tipo     = $_GET['tipo'] ?? 'obra_social';
-
-        $total = (new PriceCalculator(PricingStrategyResolver::forPatientType($tipo)))->calculate($monto);
-
-        // ❌ 3. SQL dentro del controlador (deberia ser Repository)
-        $conexion = Connection::getInstance();
-        $conexion->ejecutar("INSERT INTO orders VALUES ({$id}, '{$paciente}', {$total})");
-        // ❌ 4. Notificacion resuelta otra vez con if (deberia ser Factory)
-        $notificador = new NotificationSender();
-        $notificador->enviar('email', 'paciente@mail.com', "Pedido {$id} creado");
-
-        // ❌ 5. HTML impreso desde el controlador (deberia ser una View)
-        echo "<h1>Pedido creado</h1>";
-        echo "<p>Paciente: {$paciente}</p>";       // ❌ ademas, sin escapar: XSS
-        echo "<p>Total: $ {$total}</p>";
+        $this->facade = $facade ?? new OrderFacade();
     }
 
-    /*
-     * ✅ FORMA CORRECTA:
-     *
-     * public function create(): void
-     * {
-     *     $order = new Order(
-     *         (int) $_POST['id'],
-     *         (string) $_POST['paciente'],
-     *         (float) $_POST['monto'],
-     *         (string) $_POST['tipo']
-     *     );
-     *
-     *     $this->facade->createOrder($order);          // toda la logica, una linea
-     *
-     *     require __DIR__ . '/../../views/orders.php'; // la vista solo presenta
-     * }
-     */
+    public function create(): void
+    {
+        $order = $this->facade->createOrder(
+            (int) ($_GET['id'] ?? 1),
+            (string) ($_GET['paciente'] ?? 'Juan Perez'),
+            (float) ($_GET['monto'] ?? 15000),
+            (string) ($_GET['tipo'] ?? 'obra_social')
+        );
 
-    /**
-     * ❌ METODO MAL APLICADO: index()
-     *    Delega en la vista la consulta a la base de datos (ver views/orders.php).
-     */
+        require __DIR__ . '/../../views/order_created.php';
+    }
+
     public function index(): void
     {
+        $pedidos = $this->facade->listOrders();
+
         require __DIR__ . '/../../views/orders.php';
     }
 
-    /**
-     * El reporte se arma envolviendo el básico con decoradores.
-     * Orden: firma -> PDF -> marca de agua.
-     */
     public function report(): void
     {
-        $reporte = new BasicReport('Pedidos del dia');
-        $reporte = new DigitalSignatureDecorator($reporte);
-        $reporte = new PdfReportDecorator($reporte);
-        $reporte = new WatermarkDecorator($reporte);
-        echo $reporte->generate();
+        $reporte = $this->facade->dailyReport();
+
+        require __DIR__ . '/../../views/report.php';
     }
 }
-
-/*
- * ----------------------------------------------------------------------------
- * EJERCICIO 7 (TP): dejar create() con un maximo de 5 lineas ejecutables,
- * sin SQL, sin reglas de negocio y sin echo.
- *
- * PREGUNTA PARA EL PR: cuales de los 5 problemas de este archivo son deuda
- * de DISEÑO (Unidad 2) y cuales son deuda de PROCESO (Unidad 1)?
- * ----------------------------------------------------------------------------
- */
