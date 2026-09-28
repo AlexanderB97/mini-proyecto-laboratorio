@@ -6,8 +6,7 @@
  * ============================================================================
  *
  *  ✅ Implementa Notification::send(), mismo contrato que EmailNotification.
- *  ✅ Se mantiene mandarSms() por compatibilidad con el código que aún no
- *     fue refactorizado.
+ *  ✅ Se crea solo a través de NotificationFactory.
  * ============================================================================
  */
 
@@ -19,11 +18,6 @@ class SmsNotification implements Notification
 
     public function send(string $message): void
     {
-        $this->mandarSms($this->numero, $message);
-    }
-
-    public function mandarSms(string $numero, string $texto): void
-    {
-        echo "[SMS] a {$numero}: {$texto}<br>";
+        echo "[SMS] a {$this->numero}: {$message}<br>";
     }
 }

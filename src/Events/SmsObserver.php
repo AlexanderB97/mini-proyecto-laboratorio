@@ -7,6 +7,6 @@ final class SmsObserver implements OrderObserver
 
     public function update(Order $order): void
     {
-        (new NotificationSender())->enviar('sms', $this->phone, "Pedido {$order->id} creado");
+        NotificationFactory::create('sms', $this->phone)->send("Pedido {$order->id} creado");
     }
 }

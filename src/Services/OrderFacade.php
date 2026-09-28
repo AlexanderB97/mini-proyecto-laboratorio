@@ -17,16 +17,20 @@
  */
 final class OrderFacade
 {
-    /** Crea el pedido: calcula el total, lo guarda y avisa al paciente. */
+    private OrderService $orders;
+
+    public function __construct(?OrderService $orders = null)
+    {
+        $this->orders = $orders ?? new OrderService();
+    }
+
+    /**
+     * Crea el pedido. OrderService valida, calcula, guarda y dispara los avisos.
+     * @throws InvalidArgumentException si los datos de entrada no son validos.
+     */
     public function createOrder(int $id, string $paciente, float $monto, string $tipoPaciente): Order
     {
-        $total = $this->calculator($tipoPaciente)->calculate($monto);
-        $order = new Order($id, $paciente, $total, $tipoPaciente);
-        $order->guardar();
-
-        NotificationFactory::create('email', 'paciente@mail.com')->send("Pedido {$id} creado");
-
-        return $order;
+        return $this->orders->createOrder($id, $paciente, $monto, $tipoPaciente);
     }
 
     /**
