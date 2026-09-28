@@ -22,6 +22,12 @@
 // ❌ MAL APLICADO: carga manual. Cada clase nueva obliga a editar este archivo.
 require_once __DIR__ . '/../src/Database/Connection.php';
 require_once __DIR__ . '/../src/Models/Order.php';
+require_once __DIR__ . '/../src/Pricing/PricingStrategy.php';
+require_once __DIR__ . '/../src/Pricing/ParticularStrategy.php';
+require_once __DIR__ . '/../src/Pricing/ObraSocialStrategy.php';
+require_once __DIR__ . '/../src/Pricing/JubiladoStrategy.php';
+require_once __DIR__ . '/../src/Pricing/PrepagaStrategy.php';
+require_once __DIR__ . '/../src/Pricing/PricingStrategyResolver.php';
 require_once __DIR__ . '/../src/Pricing/PriceCalculator.php';
 require_once __DIR__ . '/../src/Notifications/EmailNotification.php';
 require_once __DIR__ . '/../src/Notifications/SmsNotification.php';
