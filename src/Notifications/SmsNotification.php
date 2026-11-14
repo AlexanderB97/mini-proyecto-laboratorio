@@ -1,8 +1,9 @@
 <?php
+
 /**
  * ============================================================================
  *  NOTIFICACION POR SMS
- *  Patron aplicado: FACTORY METHOD (creacional)
+ *  Patron aplicado: FACTORY (creacional)
  * ============================================================================
  *
  *  ✅ Implementa Notification::send(), mismo contrato que EmailNotification.

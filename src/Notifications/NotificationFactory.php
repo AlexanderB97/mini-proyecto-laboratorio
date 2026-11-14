@@ -1,8 +1,9 @@
 <?php
+
 /**
  * ============================================================================
  *  ENVIO DE NOTIFICACIONES
- *  Patron aplicado: FACTORY METHOD (creacional)
+ *  Patron aplicado: FACTORY (creacional)
  * ============================================================================
  *
  *  ✅ NotificationFactory concentra la creación: el resto del sistema deja

@@ -1,9 +1,11 @@
 <?php
 
-// Ejercicio 5: se agrego sin modificar OrderSubject.
+// Aviso por SMS: se agregó como observer nuevo, sin modificar OrderSubject (OCP).
 final class SmsObserver implements OrderObserver
 {
-    public function __construct(private string $phone) {}
+    public function __construct(private string $phone)
+    {
+    }
 
     public function update(Order $order): void
     {

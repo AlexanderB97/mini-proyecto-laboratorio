@@ -25,14 +25,3 @@ class LegacyNotifier
         echo "[LEGACY] {$text}<br>";
     }
 }
-
-final class LegacyNotifierAdapter implements Notification
-{
-    // COMPOSICION: el adapter TIENE el sistema viejo adentro
-    public function __construct(private LegacyNotifier $legacy) {}
-
-    public function send(string $message): void
-    {
-        $this->legacy->sendMessage($message);
-    }
-}

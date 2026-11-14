@@ -2,7 +2,9 @@
 
 final class JubiladoStrategy implements PricingStrategy
 {
-    public function __construct(private float $discount = 0.50) {}
+    public function __construct(private float $discount = 0.50)
+    {
+    }
 
     public function calculate(float $amount): float
     {
