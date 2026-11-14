@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ============================================================================
  *  GENERACION DE REPORTES
@@ -16,5 +17,7 @@
 
 abstract class ReportDecorator implements Report
 {
-    public function __construct(protected Report $report) {}
+    public function __construct(protected Report $report)
+    {
+    }
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<ruleset name="laboratorio-pedidos">
+    <description>Estándar de codificación del proyecto: PSR-12.</description>
+
+    <file>src</file>
+    <file>tests</file>
+
+    <arg name="colors"/>
+    <arg value="sp"/>
+
+    <rule ref="PSR12">
+        <!--
+            El proyecto no usa namespaces: las clases se cargan por archivo.
+            Migrar todo a namespaces es un cambio grande que queda fuera de este TP,
+            por eso se excluye solo esta regla y se documenta acá.
+        -->
+        <exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace"/>
+    </rule>
+
+    <!-- Los métodos de prueba se nombran en español y con guiones bajos para que se lean como frases. -->
+    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
+        <exclude-pattern>tests/*</exclude-pattern>
+    </rule>
+</ruleset>

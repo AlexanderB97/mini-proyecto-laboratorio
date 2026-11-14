@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ============================================================================
  *  CALCULO DE PRECIOS
@@ -15,7 +16,9 @@ final class PriceCalculator
 {
     private const IVA = 0.21;
 
-    public function __construct(private PricingStrategy $strategy) {}
+    public function __construct(private PricingStrategy $strategy)
+    {
+    }
 
     public function calculate(float $amount): float
     {

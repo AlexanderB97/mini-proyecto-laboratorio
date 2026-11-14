@@ -1,19 +1,15 @@
 <?php
+
 /**
  * ============================================================================
  *  NOTIFICACION POR EMAIL
- *  Patron aplicado: FACTORY METHOD (creacional)
+ *  Patron aplicado: FACTORY (creacional)
  * ============================================================================
  *
  *  ✅ Implementa Notification::send() para compartir contrato con SMS.
  *  ✅ Se crea solo a través de NotificationFactory.
  * ============================================================================
  */
-
-interface Notification
-{
-    public function send(string $message): void;
-}
 
 class EmailNotification implements Notification
 {

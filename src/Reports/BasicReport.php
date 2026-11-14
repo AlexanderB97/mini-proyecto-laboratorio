@@ -2,7 +2,9 @@
 
 final class BasicReport implements Report
 {
-    public function __construct(private string $contenido) {}
+    public function __construct(private string $contenido)
+    {
+    }
 
     public function generate(): string
     {

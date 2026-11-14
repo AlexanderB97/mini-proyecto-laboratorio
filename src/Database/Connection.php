@@ -26,7 +26,9 @@ class Connection
     {
         $archivo = __DIR__ . '/../../config/database.php';
         if (!is_file($archivo)) {
-            throw new RuntimeException('Falta config/database.php. Copiá config/database.example.php y completá los datos.');
+            throw new RuntimeException(
+                'Falta config/database.php. Copiá config/database.example.php y completá los datos.'
+            );
         }
         $this->config = require $archivo;
 
