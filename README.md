@@ -1,11 +1,14 @@
 # laboratorio-pedidos
 
+[![CI](https://github.com/AlexanderB97/mini-proyecto-laboratorio/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexanderB97/mini-proyecto-laboratorio/actions/workflows/ci.yml)
+
 Sistema de pedidos de un laboratorio de análisis clínicos: crea pedidos, calcula el total según el tipo de paciente, avisa al paciente, lista pedidos y genera un reporte diario.
 
-- **PHP vanilla**: sin frameworks y sin Composer.
+- **PHP vanilla**: sin frameworks. La aplicación corre sin Composer; Composer solo se usa para las herramientas de desarrollo (PHPUnit y phpcs).
 - **Persistencia simulada en memoria**: no hace falta MySQL ni crear ninguna base de datos.
 - Materia: **Metodología de Sistemas II** — Tecnicatura Universitaria en Programación (TUP), UTN FRRe (sede Formosa).
 - **TP Integrador, Unidades 1 y 2**: refactorizar un proyecto con deuda técnica sembrada, aplicando un patrón por rama y un Pull Request por patrón.
+- **Segundo parcial (IE3), Unidades 4 y 5**: pruebas unitarias con PHPUnit, casos de prueba documentados e integración continua con GitHub Actions.
 
 ---
 
@@ -98,6 +101,37 @@ C:\xampp\php\php.exe -r "`$_GET['accion']='crear'; chdir('public'); require 'ind
 
 ---
 
+## Pruebas e integración continua
+
+Las pruebas unitarias cubren el código refactorizado (Strategy, Factory, Adapter, Singleton, Observer, Decorator y SRP). Los casos de prueba, con su caso positivo y negativo por funcionalidad, están documentados en [`docs/CASOS-DE-PRUEBA.md`](docs/CASOS-DE-PRUEBA.md).
+
+**Requisito extra:** [Composer](https://getcomposer.org/download/) (solo para las pruebas; la aplicación no lo necesita).
+
+```powershell
+composer install                    # instala PHPUnit y phpcs en vendor/
+composer test                       # corre las pruebas unitarias
+composer lint:style                 # revisa el estándar PSR-12
+```
+
+Si falta `config/database.php`, las pruebas avisan y no corren: copialo desde `config/database.example.php` (paso de la instalación).
+
+### Pipeline de GitHub Actions
+
+El workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) se dispara en **cada push y en cada Pull Request**. Corre en PHP 8.2 y 8.3, y sus etapas van de la más rápida a la más lenta, para que un error aparezca en segundos (*fail fast*):
+
+| Etapa | Comando | Qué valida |
+|---|---|---|
+| 1. Dependencias | `composer install` | Que el proyecto se pueda instalar desde cero |
+| 2. Lint de sintaxis | `composer lint:syntax` (`php -l`) | Que ningún archivo PHP tenga errores de sintaxis |
+| 3. Estándar | `composer lint:style` (`phpcs`, PSR-12) | Que el código respete el estándar de codificación acordado |
+| 4. Pruebas | `composer test` (PHPUnit) | Que todas las pruebas unitarias sigan pasando |
+
+Si una etapa falla, las siguientes no se ejecutan y el PR queda marcado en rojo: **no se mergea un PR con el CI fallando.**
+
+El estándar es PSR-12 con dos excepciones documentadas en `phpcs.xml`: el proyecto no usa namespaces, y los finales de línea no se revisan porque los normaliza Git (`.gitattributes` guarda LF en el repo; en Windows, Git los convierte a CRLF al descargar). `composer exec phpcbf` corrige automáticamente la mayoría de los problemas de formato.
+
+---
+
 ## Problemas frecuentes
 
 | Síntoma | Causa | Solución |
@@ -106,6 +140,7 @@ C:\xampp\php\php.exe -r "`$_GET['accion']='crear'; chdir('public'); require 'ind
 | `Fatal error: Uncaught RuntimeException: Falta config/database.php...` | No se creó el archivo de configuración | `Copy-Item config\database.example.php config\database.php` desde la carpeta del proyecto |
 | **No se pudo crear el pedido** (`Monto invalido` o `Falta el paciente`) | Los parámetros de la URL no pasan la validación de `OrderValidator` | No es una falla: el monto tiene que ser mayor que 0 y el paciente no puede estar vacío |
 | `404 Not Found` | La carpeta no está en `C:\xampp\htdocs\` o tiene otro nombre | Tiene que quedar `C:\xampp\htdocs\mini-proyecto-laboratorio\public\index.php` |
+| `'composer' no se reconoce como un comando` | Composer no está instalado o no está en el PATH | Instalarlo con el instalador de Windows de getcomposer.org y abrir una terminal nueva |
 | En la terminal aparecen caracteres raros como `âœ…`, `âŒ` o `estÃ¡tica` | Los comentarios del código tienen emojis y acentos en UTF-8, y `Get-Content` de PowerShell 5.1 los lee con otra codificación | **No es un error del archivo.** Usar `Get-Content -Encoding UTF8 <archivo>` o abrirlo con VS Code |
 
 ---
@@ -221,10 +256,10 @@ Estas deudas siguen en el código y **no se abordaron** en este TP:
 ## Flujo de trabajo del equipo
 
 - **Nadie escribe en `main`.** Es una rama protegida: solo se modifica por Pull Request, con **1 aprobación obligatoria**.
-- **Una rama por patrón**, creada desde `main` actualizado: `feat/patron-<nombre>`, `docs/<tema>`, etc.
+- **Una rama por patrón**, creada desde `main` actualizado: `feat/patron-<nombre>`, `test/<tema>`, `ci/<tema>`, `fix/<tema>`, `docs/<tema>`.
 - **Un PR por rama**, con cuatro secciones: **Deuda identificada**, **Patrón aplicado**, **Consecuencia asumida** y **Cómo probarlo**.
-- **Cada PR lo aprueba otro integrante**, nunca quien lo abrió.
-- **Commits con convención**: `feat:` (funcionalidad), `fix:` (corrección), `refactor:` (cambio de estructura sin cambiar comportamiento), `docs:` (documentación).
+- **Cada PR lo aprueba otro integrante**, nunca quien lo abrió, y **solo se mergea con el CI en verde**.
+- **Commits con convención**: `feat:` (funcionalidad), `fix:` (corrección), `refactor:` (cambio de estructura sin cambiar comportamiento), `docs:` (documentación), `test:` (pruebas), `ci:` (pipeline), `style:` (formato).
 - **Issues con etiquetas** para cada deuda, y un **tablero Kanban** en GitHub Projects para seguir su estado. Cada PR cierra su Issue con `Closes #N`.
 
 ---
