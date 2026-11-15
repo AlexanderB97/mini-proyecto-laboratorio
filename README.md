@@ -88,7 +88,7 @@ Cualquier otra acción muestra `Accion no encontrada`.
 
 Si los datos del pedido no son válidos, no se crea y se ve **No se pudo crear el pedido** con el motivo. Por ejemplo, `?accion=crear&monto=0` muestra `Monto invalido`, y `?accion=crear&paciente=%20` muestra `Falta el paciente`.
 
-`?accion=crear` acepta parámetros opcionales para probar otros casos: `id`, `paciente`, `monto` y `tipo` (`obra_social`, `jubilado`, `prepaga` o `particular`). Por ejemplo, `?accion=crear&monto=10000&tipo=jubilado` da un total de `$ 5000`.
+`?accion=crear` acepta parámetros opcionales para probar otros casos: `id`, `paciente`, `monto` y `tipo` (`obra_social`, `jubilado`, `prepaga` o `particular`). Por ejemplo, `?accion=crear&monto=10000&tipo=jubilado` da un total de `$ 5000`. Un tipo que no está en esa lista (por ejemplo `?accion=crear&tipo=obrasocial`) no crea el pedido y muestra `Tipo de paciente no soportado: obrasocial`.
 
 También se puede probar sin Apache, desde la carpeta del proyecto:
 
