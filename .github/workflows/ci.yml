@@ -1,0 +1,53 @@
+# Integración continua: valida el código en cada push y en cada Pull Request.
+# Etapas ordenadas de la más rápida a la más lenta (fail fast):
+# dependencias -> lint (sintaxis + PSR-12) -> pruebas unitarias.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validar:
+    name: Lint y pruebas (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php: ['8.2', '8.3']
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Instalar PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer:v2
+          coverage: none
+
+      - name: Cachear las dependencias de Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ runner.os }}-${{ matrix.php }}-${{ hashFiles('composer.json', 'composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-${{ matrix.php }}-
+
+      - name: Instalar dependencias
+        run: composer install --no-progress --no-interaction --prefer-dist
+
+      - name: Lint de sintaxis (php -l)
+        run: composer lint:syntax
+
+      - name: Estándar de codificación (PSR-12 con phpcs)
+        run: composer lint:style
+
+      - name: Preparar la configuración de prueba
+        run: cp config/database.example.php config/database.php
+
+      - name: Pruebas unitarias (PHPUnit)
+        run: composer test

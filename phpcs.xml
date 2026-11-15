@@ -15,6 +15,13 @@
             por eso se excluye solo esta regla y se documenta acá.
         -->
         <exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace"/>
+
+        <!--
+            Los finales de línea los normaliza Git (.gitattributes guarda LF en el repo).
+            En Windows, Git los convierte a CRLF al descargar el código y phpcs los marcaría
+            en todas las líneas aunque el repositorio esté bien, por eso no se revisan acá.
+        -->
+        <exclude name="Generic.Files.LineEndings"/>
     </rule>
 
     <!-- Los métodos de prueba se nombran en español y con guiones bajos para que se lean como frases. -->
