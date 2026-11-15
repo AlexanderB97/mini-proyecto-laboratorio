@@ -88,10 +88,4 @@ class Order
      *     }
      * }
      */
-
-    public function calcularTotal(): float
-    {
-        $strategy = PricingStrategyResolver::forPatientType($this->patientType);
-        return (new PriceCalculator($strategy))->calculate($this->amount);
-    }
 }
