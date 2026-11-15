@@ -30,11 +30,15 @@ jobs:
           tools: composer:v2
           coverage: none
 
+      - name: Obtener la carpeta de caché de Composer
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
       - name: Cachear las dependencias de Composer
         uses: actions/cache@v4
         with:
-          path: ~/.composer/cache
-          key: composer-${{ runner.os }}-${{ matrix.php }}-${{ hashFiles('composer.json', 'composer.lock') }}
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ runner.os }}-${{ matrix.php }}-${{ hashFiles('composer.lock') }}
           restore-keys: composer-${{ runner.os }}-${{ matrix.php }}-
 
       - name: Instalar dependencias
