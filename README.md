@@ -242,12 +242,10 @@ src\Pricing\ObraSocialStrategy.php:5:    public function __construct(private flo
 
 ## Deuda conocida pendiente
 
-Estas deudas siguen en el código y **no se abordaron** en este TP:
+Estas deudas siguen en el código y **no se abordaron** en este TP. La carga manual con `require_once` y el ruteo con `if` encadenados de `public/index.php` ya se resolvieron con `spl_autoload_register()` y una tabla de rutas.
 
 | Dónde | Deuda | Solución sugerida |
 |---|---|---|
-| `public/index.php` | Carga manual de dependencias: casi 30 `require_once`. Cada clase nueva obliga a editar este archivo y el orden importa | `spl_autoload_register()` que resuelva `src/<Carpeta>/<Clase>.php`, o Composer con PSR-4 |
-| `public/index.php` | Ruteo con `if / elseif` encadenados: cada pantalla nueva obliga a modificar el bloque (viola OCP) | Un mapa de rutas: `array` de `accion => callable`, con 404 si la acción no existe |
 | `src/Models/Order.php` | Propiedades públicas y mutables, sin validación en el constructor. `guardar()` arma el SQL por concatenación (riesgo de inyección) y mezcla dominio con persistencia | Propiedades `readonly` con validación, y un `OrderRepository` con consultas preparadas |
 | `src/Services/OrderFacade.php` | `listOrders()` devuelve datos de demostración fijos (la persistencia está simulada) | Leerlos desde el futuro `OrderRepository` |
 
